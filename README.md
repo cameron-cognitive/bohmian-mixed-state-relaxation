@@ -22,30 +22,93 @@ This project extends their work to mixed quantum states, represented by density 
 
 ## Installation
 
+### Prerequisites
+
+- Python 3.8 or higher
+- NumPy, Matplotlib, SciPy, tqdm
+
+### Setup
+
 ```bash
+# Clone the repository
 git clone https://github.com/cameron-cognitive/bohmian-mixed-state-relaxation.git
 cd bohmian-mixed-state-relaxation
-# Recommended: Create a virtual environment
+
+# Create and activate a virtual environment (recommended)
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
 pip install -r requirements.txt
+
+# Or using make
+make setup
 ```
 
 ## Usage
+
+### Command Line Interface
+
+The main simulation can be run with various parameters:
 
 ```bash
 python main.py --modes 4 --particles 1000 --tmax 2.0 --aligned-phases
 ```
 
-See documentation for additional arguments and examples.
+Key parameters:
+- `--modes`: Number of modes in each pure state (default: 4)
+- `--particles`: Number of particles to simulate (default: 1000)
+- `--tmax`: Maximum simulation time in box periods (default: 2.0)
+- `--aligned-phases`: Use aligned phases for partial convergence
+- `--random-phases`: Use random phases for full convergence
+- `--pure-state`: Simulate pure state (not mixed)
+- `--animate`: Generate animations of the simulation
 
-## Examples
+### Running Examples
 
-The `examples` directory contains several demonstration scenarios:
+The repository includes several example scripts demonstrating different aspects of quantum relaxation:
 
-- `pure_state.py`: Reproduces Valentini's original pure-state results
-- `mixed_state.py`: Extends to a 50/50 mixture of two pure states
-- `partial_convergence.py`: Demonstrates conditions with ~10% residual non-equilibrium
+```bash
+# Run with make
+make pure_state       # Run pure state example
+make mixed_state      # Run mixed state example
+make partial_convergence  # Run partial convergence example
+make examples         # Run all examples
+
+# Or run directly
+python examples/pure_state.py
+python examples/mixed_state.py
+python examples/partial_convergence.py
+```
+
+### Jupyter Notebook
+
+An interactive tutorial is available as a Jupyter notebook:
+
+```bash
+# Start Jupyter notebook server
+jupyter notebook notebooks/bohmian_relaxation_demo.ipynb
+
+# Or using make
+make notebooks
+```
+
+## Project Structure
+
+- `src/`: Core simulation code
+  - `system.py`: Defines the 2D infinite square well system
+  - `quantum_state.py`: Implements pure and mixed quantum states
+  - `relaxation.py`: Handles Bohmian relaxation simulation
+  - `visualization.py`: Provides plotting and animation functions
+- `examples/`: Example scripts demonstrating various scenarios
+- `notebooks/`: Interactive Jupyter notebooks for exploration
+- `main.py`: Command-line interface to the simulation
+
+## Key Results
+
+1. **Full Relaxation**: With random phases and sufficient modes, both pure and mixed states fully relax to quantum equilibrium.
+2. **Partial Non-Convergence**: With aligned phases and specific mode selections (especially commensurate frequencies), ~10% residual non-equilibrium can be observed, matching Valentini's findings.
+3. **Mixed vs. Pure**: The mixed state formalism correctly extends the pure state case, with the H-function properly tracking the relaxation to the density matrix diagonal.
 
 ## References
 
