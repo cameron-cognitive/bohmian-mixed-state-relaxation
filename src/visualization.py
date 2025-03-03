@@ -80,7 +80,7 @@ def plot_mixed_state(mixed_state: MixedState, t: float, title: Optional[str] = N
     
     # Plot diagonal density matrix elements
     im = ax.pcolormesh(X, Y, rho_diag, cmap='viridis', shading='auto')
-    plt.colorbar(im, ax=ax, label='Probability density $\\rho(x,y)$')
+    plt.colorbar(im, ax=ax, label=r'Probability density $\\rho(x,y)$')
     
     # Add labels and title
     ax.set_xlabel('x')
