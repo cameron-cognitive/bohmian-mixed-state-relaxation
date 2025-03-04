@@ -215,8 +215,8 @@ class InfiniteSquareWell2D:
         psi_masked = np.ma.array(psi, mask=mask)
         
         # Calculate velocity components
-        vx = prefactor * np.ma.getdata(np.ma.imag(dpsi_dx / psi_masked))
-        vy = prefactor * np.ma.getdata(np.ma.imag(dpsi_dy / psi_masked))
+        vx = prefactor * np.ma.getdata((dpsi_dx / psi_masked).imag) # Changed np.ma.imag to .imag
+        vy = prefactor * np.ma.getdata((dpsi_dy / psi_masked).imag)
         
         # Fill any masked points with zeros
         vx[mask] = 0.0
