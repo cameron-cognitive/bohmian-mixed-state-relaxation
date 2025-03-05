@@ -264,9 +264,6 @@ class InfiniteSquareWell2D:
                         dx_small = 1e-5 * self.L
                         dy_small = 1e-5 * self.L
                         
-                        # Compute derivatives of the density matrix at (x,y)
-                        # We need W(q,q′) in the neighborhood of q=q′
-                        
                         # We'll implement the approach from Dürr 2003, computing
                         # the current j = Im(ℏ/m * ∇W(q,q′))|_{q′=q}
                         # and the velocity v = j/ρ
