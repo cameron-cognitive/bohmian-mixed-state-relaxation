@@ -231,8 +231,9 @@ class InfiniteSquareWell2D:
                 psi_masked = np.ma.array(psi, mask=mask)
                 
                 # Calculate velocity components
-                vx = prefactor * np.ma.getdata(np.ma.imag(dpsi_dx / psi_masked))
-                vy = prefactor * np.ma.getdata(np.ma.imag(dpsi_dy / psi_masked))
+                # FIX: Apply imag() to the result of division, not the masked array module
+                vx = prefactor * np.ma.getdata(np.imag(dpsi_dx / psi_masked))
+                vy = prefactor * np.ma.getdata(np.imag(dpsi_dy / psi_masked))
                 
                 # Fill any masked points with zeros
                 vx[mask] = 0.0
@@ -350,8 +351,9 @@ class InfiniteSquareWell2D:
             psi_masked = np.ma.array(psi, mask=mask)
             
             # Calculate velocity components
-            vx = prefactor * np.ma.getdata(np.ma.imag(dpsi_dx / psi_masked))
-            vy = prefactor * np.ma.getdata(np.ma.imag(dpsi_dy / psi_masked))
+            # FIX: Apply imag() to the result of division, not the masked array module
+            vx = prefactor * np.ma.getdata(np.imag(dpsi_dx / psi_masked))
+            vy = prefactor * np.ma.getdata(np.imag(dpsi_dy / psi_masked))
             
             # Fill any masked points with zeros
             vx[mask] = 0.0
