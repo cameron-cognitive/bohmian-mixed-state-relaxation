@@ -1,115 +1,186 @@
-# Bohmian Mixed-State Relaxation Simulation
+# Bohmian Mixed-State Relaxation
 
-This repository implements a numerical simulation of quantum relaxation in Bohmian mechanics, extending Valentini's 2D infinite square well model from pure quantum states to mixed states (density matrices).
+This repository contains simulation code for studying quantum relaxation in Bohmian mechanics, extending the traditional approach to include mixed quantum states described by density matrices.
 
-## Background
+## Overview
 
-In Bohmian mechanics (also known as de Broglie-Bohm theory or pilot-wave theory), quantum systems consist of actual particles guided by a wave function. Valentini and Westman (2005) showed how an initially non-equilibrium distribution of particle positions in a 2D box can relax toward the standard Born rule distribution (|ψ|²).
+Bohmian mechanics (also known as de Broglie-Bohm theory) is a deterministic interpretation of quantum mechanics where particles have definite positions guided by a quantum potential. This project explores how an initial non-equilibrium distribution of Bohmian particles approaches quantum equilibrium in a 2D infinite square well, with a special focus on mixed quantum states as described by the von Neumann guidance equation.
 
-This project extends their work to mixed quantum states, represented by density matrices W, and investigates whether relaxation to quantum equilibrium is complete or partial under various conditions.
+Key features:
+- Implementation of pure and mixed quantum states
+- 2D infinite square well system with configurable parameters
+- Bohmian relaxation simulation with the von Neumann guidance equation
+- Comprehensive visualization tools for particle distributions and velocity fields
+- Coarse-grained relaxation metrics (H-function) at different scales
 
-## Features
+## Prerequisites
 
-- Simulation of 2D box with various eigenstate superpositions
-- Mixed state (density matrix) evolution
-- Non-equilibrium initial conditions via backward-time evolution
-- Runge-Kutta 4 integration of Bohmian trajectories
-- Computation of matrix-based relative entropy H-function:
-  H(t) = Tr[ρ(t)(ln ρ(t) - ln W(t))]
-- Coarse-graining analysis at multiple scales
-- Visualization of relaxation dynamics
-- Identification of conditions leading to partial non-convergence
+- Python 3.6 or higher
+- NumPy (for numerical calculations)
+- Matplotlib (for visualizations)
+- SciPy (for integration and interpolation)
+- tqdm (for progress bars)
 
 ## Installation
 
-### Prerequisites
-
-- Python 3.8 or higher
-- NumPy, Matplotlib, SciPy, tqdm
-
-### Setup
+### Option 1: Clone and setup manually
 
 ```bash
 # Clone the repository
 git clone https://github.com/cameron-cognitive/bohmian-mixed-state-relaxation.git
 cd bohmian-mixed-state-relaxation
 
-# Create and activate a virtual environment (recommended)
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
 # Install dependencies
-pip install -r requirements.txt
-
-# Or using make
-make setup
+pip install numpy matplotlib scipy tqdm
 ```
 
-## Usage
-
-### Command Line Interface
-
-The main simulation can be run with various parameters:
+### Option 2: Use the setup script
 
 ```bash
-python main.py --modes 4 --particles 1000 --tmax 2.0 --aligned-phases
+# Clone the repository
+git clone https://github.com/cameron-cognitive/bohmian-mixed-state-relaxation.git
+cd bohmian-mixed-state-relaxation
+
+# Run the setup script
+python setup.py
 ```
 
-Key parameters:
-- `--modes`: Number of modes in each pure state (default: 4)
-- `--particles`: Number of particles to simulate (default: 1000)
-- `--tmax`: Maximum simulation time in box periods (default: 2.0)
-- `--aligned-phases`: Use aligned phases for partial convergence
-- `--random-phases`: Use random phases for full convergence
-- `--pure-state`: Simulate pure state (not mixed)
-- `--animate`: Generate animations of the simulation
+## Running Tests
 
-### Running Examples
-
-The repository includes several example scripts demonstrating different aspects of quantum relaxation:
+The repository includes comprehensive tests to ensure all components work correctly. Tests are particularly focused on verifying the velocity field calculations.
 
 ```bash
-# Run with make
-make pure_state       # Run pure state example
-make mixed_state      # Run mixed state example
-make partial_convergence  # Run partial convergence example
-make examples         # Run all examples
+# Run all tests
+python -m tests.run_tests
 
-# Or run directly
-python examples/pure_state.py
-python examples/mixed_state.py
-python examples/partial_convergence.py
+# Run only basic tests
+python -m tests.run_tests --type basic
+
+# Run only velocity field tests
+python -m tests.run_tests --type velocity
+
+# Run tests with minimal output
+python -m tests.run_tests --quiet
 ```
 
-### Jupyter Notebook
+## Running Simulations
 
-An interactive tutorial is available as a Jupyter notebook:
+### Option 1: Use the workflow script
+
+The easiest way to run a simulation is to use the provided workflow script, which handles the entire process from repository cloning to visualization:
 
 ```bash
-# Start Jupyter notebook server
-jupyter notebook notebooks/bohmian_relaxation_demo.ipynb
+# Download the workflow script
+curl -O https://raw.githubusercontent.com/cameron-cognitive/bohmian-mixed-state-relaxation/main/scripts/workflow.py
 
-# Or using make
-make notebooks
+# Run a mixed state simulation
+python workflow.py
+
+# Run a pure state simulation
+python workflow.py --simulation-type pure
+
+# Specify custom output directory
+python workflow.py --output-dir custom_output
+```
+
+### Option 2: Manual simulation
+
+For more control over the simulation parameters, you can write your own script:
+
+```python
+from src.system import InfiniteSquareWell2D
+from src.quantum_state import PureState, MixedState
+from src.relaxation import BohmianRelaxation
+from src.von_neumann_visualization import VonNeumannRelaxationVisualizer
+
+# Create a system
+L = 1.0  # Box size
+system = InfiniteSquareWell2D(L)
+
+# Create a mixed quantum state
+state1 = PureState(L, [(1, 1, 1.0)])  # Ground state
+state2 = PureState(L, [(2, 1, 1.0)])  # First excited state in x
+mixed_state = MixedState(L, [(state1, 0.7), (state2, 0.3)])
+
+# Create a relaxation simulation
+n_particles = 1000
+relaxation = BohmianRelaxation(system, mixed_state, n_particles)
+
+# Run simulation
+t_max = 2.0
+dt = 0.05
+results = relaxation.run_simulation(t_max, dt)
+
+# Create visualizer and generate visualizations
+visualizer = VonNeumannRelaxationVisualizer(relaxation, results)
+
+# Create density matrix comparison
+fig = visualizer.create_density_matrix_comparison(0)  # For t=0
+fig.savefig('density_comparison_t0.png')
+
+# Create velocity field visualization
+fig = visualizer.create_velocity_field_visualization(0)
+fig.savefig('velocity_field.png')
+
+# Calculate and plot H-function evolution
+visualizer.calculate_and_save_h_functions('output')
 ```
 
 ## Project Structure
 
 - `src/`: Core simulation code
-  - `system.py`: Defines the 2D infinite square well system
-  - `quantum_state.py`: Implements pure and mixed quantum states
-  - `relaxation.py`: Handles Bohmian relaxation simulation
-  - `visualization.py`: Provides plotting and animation functions
-- `examples/`: Example scripts demonstrating various scenarios
-- `notebooks/`: Interactive Jupyter notebooks for exploration
-- `main.py`: Command-line interface to the simulation
+  - `quantum_state.py`: Implementation of pure and mixed quantum states
+  - `system.py`: System definitions (e.g., 2D infinite square well)
+  - `relaxation.py`: Bohmian relaxation simulation engine
+  - `von_neumann_visualization.py`: Visualization tools for relaxation
+- `tests/`: Comprehensive test suite
+  - `test_suite.py`: Basic tests for all components
+  - `test_velocity_field.py`: Specialized tests for velocity field calculations
+  - `run_tests.py`: Test runner script
+- `scripts/`: Utility scripts
+  - `setup.py`: Setup script for the repository
+  - `workflow.py`: Complete workflow script for simulations
+- `examples/`: Example simulations and scripts
+- `output/`: Default directory for simulation output
 
-## Key Results
+## Key Concepts
 
-1. **Full Relaxation**: With random phases and sufficient modes, both pure and mixed states fully relax to quantum equilibrium.
-2. **Partial Non-Convergence**: With aligned phases and specific mode selections (especially commensurate frequencies), ~10% residual non-equilibrium can be observed, matching Valentini's findings.
-3. **Mixed vs. Pure**: The mixed state formalism correctly extends the pure state case, with the H-function properly tracking the relaxation to the density matrix diagonal.
+### Mixed States and von Neumann Guidance
 
-## References
+In standard Bohmian mechanics, particle velocities are determined by the gradient of the wave function's phase. For mixed states described by density matrices, we use the von Neumann guidance equation:
 
-- Valentini, A., & Westman, H. (2005). Dynamical origin of quantum probabilities. *Proceedings of the Royal Society A: Mathematical, Physical and Engineering Sciences*, 461(2053), 253-272.
+```
+v(x,t) = ∇S(x,t)/m
+```
+
+where S is related to the phase of the density matrix in the position representation.
+
+### Quantum Relaxation
+
+Quantum relaxation refers to the process by which a non-equilibrium distribution of Bohmian particles approaches the quantum equilibrium distribution (where particle density equals |ψ|²).
+
+### H-Function
+
+The H-function is a measure of how far the system is from quantum equilibrium, defined as:
+
+```
+H(t) = ∫ ρ(x,t) ln[ρ(x,t)/|ψ(x,t)|²] dx
+```
+
+where ρ(x,t) is the particle density and |ψ(x,t)|² is the quantum probability density.
+
+### Coarse-Graining
+
+Coarse-graining involves analyzing the system at different scales, which can reveal interesting scale-dependent relaxation properties.
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## Acknowledgments
+
+This project extends the work on quantum relaxation by Antony Valentini and others to the domain of mixed quantum states.
